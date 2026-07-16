@@ -1,6 +1,6 @@
 // Build/dev script — bundles the app with esbuild and copies static assets to dist/.
 //   node build.mjs           → one-off production build
-//   node build.mjs --serve   → watch + local dev server on http://localhost:8000
+//   node build.mjs --serve   → watch + local dev server on http://localhost:5555
 import esbuild from "esbuild";
 import { cp, mkdir, rm } from "node:fs/promises";
 
@@ -31,7 +31,7 @@ if (serve) {
   const ctx = await esbuild.context(options);
   await ctx.watch();
   // Rebuild static assets on each change too.
-  const { host, port } = await ctx.serve({ servedir: outdir, port: 8000 });
+  const { host, port } = await ctx.serve({ servedir: outdir, port: 5555 });
   console.log(`Dev server: http://${host === "0.0.0.0" ? "localhost" : host}:${port}`);
 } else {
   await esbuild.build(options);

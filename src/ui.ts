@@ -74,15 +74,16 @@ function wireSegment(id: string, onChange: () => void): void {
 
 /* ── Extra payments ───────────────────────────────────────── */
 function makeExtraRow(): HTMLElement {
-  const row = document.createElement("div");
+  // A Pico `role="group"` fieldset joins its direct-child controls into a
+  // single seamless control, so the amount/year/remove inputs must be
+  // siblings (not nested) for the border-joining CSS to apply.
+  const row = document.createElement("fieldset");
+  row.setAttribute("role", "group");
   row.className = "extra";
   row.innerHTML = `
-    <input class="extra__amount" type="text" inputmode="numeric" placeholder="Amount" aria-label="Extra payment amount" />
-    <span class="extra__year-wrap">
-      <span class="extra__year-tag">YR</span>
-      <input class="extra__year" type="number" min="1" step="1" value="1" aria-label="Loan year" />
-    </span>
-    <button type="button" class="extra__remove" aria-label="Remove extra payment">×</button>
+    <input class="extra__amount figure" type="text" inputmode="numeric" placeholder="Amount" aria-label="Extra payment amount" />
+    <input class="extra__year figure" type="number" min="1" step="1" value="1" placeholder="Year" aria-label="Loan year" />
+    <button type="button" class="extra__remove outline contrast" aria-label="Remove extra payment">×</button>
   `;
   row.querySelector(".extra__remove")!.addEventListener("click", () => {
     row.remove();
@@ -401,50 +402,56 @@ function renderSchedule(res: CalculationResult, cur: Currency): void {
   tbody.innerHTML = body;
 }
 
-/* ── Theme toggle ─────────────────────────────────────────── */
+/* ── Theme switcher (Pico's Auto/Light/Dark dropdown pattern) ── */
 const THEME_KEY = "mc-theme";
+type ThemePreference = "auto" | "light" | "dark";
 
-function effectiveTheme(): "light" | "dark" {
-  const attr = document.documentElement.dataset.theme;
-  if (attr === "light" || attr === "dark") return attr;
+function preferredScheme(): "light" | "dark" {
   return window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
 }
 
-function syncThemeButton(): void {
-  const t = effectiveTheme();
-  const btn = $("themeToggle");
-  btn.dataset.effective = t;
-  btn.setAttribute(
-    "aria-label",
-    t === "dark" ? "Switch to light mode" : "Switch to dark mode",
-  );
+function readSavedPreference(): ThemePreference {
+  try {
+    const v = localStorage.getItem(THEME_KEY);
+    if (v === "light" || v === "dark" || v === "auto") return v;
+  } catch (e) {
+    // storage blocked
+  }
+  return "auto";
+}
+
+function applyPreference(pref: ThemePreference): void {
+  document.documentElement.dataset.theme =
+    pref === "auto" ? preferredScheme() : pref;
+  try {
+    localStorage.setItem(THEME_KEY, pref);
+  } catch (e) {
+    // storage blocked — theme still applies for this session
+  }
 }
 
 function initTheme(): void {
-  syncThemeButton();
-  $("themeToggle").addEventListener("click", () => {
-    const next = effectiveTheme() === "dark" ? "light" : "dark";
-    document.documentElement.dataset.theme = next;
-    try {
-      localStorage.setItem(THEME_KEY, next);
-    } catch (e) {
-      // storage blocked — theme still applies for this session
-    }
-    syncThemeButton();
-  });
-  // Follow the system if the user hasn't made an explicit choice.
+  let pref = readSavedPreference();
+  applyPreference(pref);
+
+  document
+    .querySelectorAll<HTMLAnchorElement>("[data-theme-switcher]")
+    .forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        pref = (link.dataset.themeSwitcher as ThemePreference) ?? "auto";
+        applyPreference(pref);
+        link.closest("details")?.removeAttribute("open");
+      });
+    });
+
+  // Re-resolve if the system theme changes while "Auto" is selected.
   window
     .matchMedia("(prefers-color-scheme: dark)")
     .addEventListener("change", () => {
-      let saved: string | null = null;
-      try {
-        saved = localStorage.getItem(THEME_KEY);
-      } catch (e) {
-        saved = null;
-      }
-      if (saved !== "light" && saved !== "dark") syncThemeButton();
+      if (pref === "auto") applyPreference("auto");
     });
 }
 

@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>Mortgage Calculator</title>
     <meta
       name="description"
@@ -14,114 +15,98 @@
       href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <!-- Pico CSS (v2) — semantic HTML styling. See picocss.com -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css"
+    />
     <link rel="stylesheet" href="./styles.css" />
     <script>
-      // Apply saved theme before first paint to avoid a flash.
+      // Resolve and apply the saved theme before first paint to avoid a flash.
+      // Mirrors Pico's own data-theme convention (see initTheme() in ui.ts).
       try {
-        var t = localStorage.getItem("mc-theme");
-        if (t === "light" || t === "dark")
-          document.documentElement.dataset.theme = t;
+        var saved = localStorage.getItem("mc-theme"); // "auto" | "light" | "dark"
+        var resolved =
+          saved === "light" || saved === "dark"
+            ? saved
+            : window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+        document.documentElement.dataset.theme = resolved;
       } catch (e) {}
     </script>
   </head>
   <body>
-    <main class="shell">
-      <header class="masthead">
-        <div class="masthead__text">
-          <h1 class="title">Mortgage Calculator</h1>
-          <p class="lede">
-            Set the loan and rate, add any extra payments, and see the schedule
-            update instantly.
-          </p>
-        </div>
-        <button
-          type="button"
-          id="themeToggle"
-          class="theme-toggle"
-          aria-label="Switch color theme"
-        >
-          <svg
-            class="icon icon-sun"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="12" r="5" />
-            <line x1="12" y1="1" x2="12" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="23" />
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-            <line x1="1" y1="12" x2="3" y2="12" />
-            <line x1="21" y1="12" x2="23" y2="12" />
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-          </svg>
-          <svg
-            class="icon icon-moon"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-        </button>
-      </header>
+    <header class="container masthead">
+      <hgroup>
+        <h1>Mortgage Calculator</h1>
+        <p>
+          Set the loan and rate, add any extra payments, and see the schedule
+          update instantly.
+        </p>
+      </hgroup>
+      <nav>
+        <ul>
+          <li>
+            <details class="dropdown">
+              <summary role="button" class="secondary">Theme</summary>
+              <ul dir="rtl">
+                <li><a href="#" data-theme-switcher="auto">Auto</a></li>
+                <li><a href="#" data-theme-switcher="light">Light</a></li>
+                <li><a href="#" data-theme-switcher="dark">Dark</a></li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </nav>
+    </header>
 
+    <main class="container">
       <div class="layout">
         <!-- ── Inputs ─────────────────────────────────────────── -->
         <form class="panel controls" id="controls" autocomplete="off">
-          <fieldset class="group">
+          <fieldset>
             <legend>The loan</legend>
 
-            <label class="field">
-              <span class="field__label">Loan amount</span>
-              <div class="field__money">
-                <select id="currency" class="field__currency" aria-label="Currency">
-                  <option value="none|en-US">#</option>
-                  <option value="$|en-US">$</option>
-                  <option value="£|en-GB">£</option>
-                  <option value="€|de-DE">€</option>
-                  <option value="¥|ja-JP" selected>¥</option>
-                  <option value="₩|ko-KR">₩</option>
-                  <option value="₹|en-IN">₹</option>
-                  <option value="RM|ms-MY">RM</option>
-                </select>
-                <input
-                  id="principal"
-                  class="field__input field__input--figure"
-                  type="text"
-                  inputmode="numeric"
-                  value="50,000,000"
-                />
-              </div>
-            </label>
+            <label for="principal">Loan amount</label>
+            <fieldset role="group">
+              <select id="currency" aria-label="Currency">
+                <option value="none|en-US">#</option>
+                <option value="$|en-US">$</option>
+                <option value="£|en-GB">£</option>
+                <option value="€|de-DE">€</option>
+                <option value="¥|ja-JP" selected>¥</option>
+                <option value="₩|ko-KR">₩</option>
+                <option value="₹|en-IN">₹</option>
+                <option value="RM|ms-MY">RM</option>
+              </select>
+              <input
+                id="principal"
+                class="figure"
+                type="text"
+                inputmode="numeric"
+                value="50,000,000"
+              />
+            </fieldset>
 
-            <label class="field field--split">
-              <span class="field__label">Term</span>
-              <div class="field__inline">
+            <label for="termYears" class="field-split">
+              <span>Term</span>
+              <span class="field-split__control">
                 <input
                   id="termYears"
-                  class="field__input field__input--figure"
+                  class="figure"
                   type="number"
                   min="1"
                   max="50"
                   step="1"
                   value="35"
                 />
-                <span class="field__suffix">years</span>
-              </div>
+                <span class="field-suffix">years</span>
+              </span>
             </label>
           </fieldset>
 
-          <fieldset class="group">
+          <fieldset>
             <legend>The rate</legend>
 
             <div class="segmented" role="tablist" id="rateType" aria-label="Rate type">
@@ -135,12 +120,12 @@
 
             <!-- Fixed -->
             <div class="rate-pane" data-pane="fixed">
-              <label class="field field--split">
-                <span class="field__label">Annual rate</span>
-                <div class="field__inline">
-                  <input id="fixedRatePct" class="field__input field__input--figure" type="number" min="0" max="30" step="0.01" value="0.9" />
-                  <span class="field__suffix">%</span>
-                </div>
+              <label for="fixedRatePct" class="field-split">
+                <span>Annual rate</span>
+                <span class="field-split__control">
+                  <input id="fixedRatePct" class="figure" type="number" min="0" max="30" step="0.01" value="0.9" />
+                  <span class="field-suffix">%</span>
+                </span>
               </label>
             </div>
 
@@ -153,64 +138,64 @@
 
               <!-- Ramp -->
               <div class="rate-pane" data-pane="ramp">
-                <label class="field field--split">
-                  <span class="field__label">Starting rate</span>
-                  <div class="field__inline">
-                    <input id="baseRateRamp" class="field__input field__input--figure" type="number" min="0" max="30" step="0.01" value="0.9" />
-                    <span class="field__suffix">%</span>
-                  </div>
+                <label for="baseRateRamp" class="field-split">
+                  <span>Starting rate</span>
+                  <span class="field-split__control">
+                    <input id="baseRateRamp" class="figure" type="number" min="0" max="30" step="0.01" value="0.9" />
+                    <span class="field-suffix">%</span>
+                  </span>
                 </label>
-                <label class="field field--split">
-                  <span class="field__label">Step up by</span>
-                  <div class="field__inline">
-                    <input id="rampStepPct" class="field__input field__input--figure" type="number" min="0" max="5" step="0.01" value="0.05" />
-                    <span class="field__suffix">%</span>
-                  </div>
+                <label for="rampStepPct" class="field-split">
+                  <span>Step up by</span>
+                  <span class="field-split__control">
+                    <input id="rampStepPct" class="figure" type="number" min="0" max="5" step="0.01" value="0.05" />
+                    <span class="field-suffix">%</span>
+                  </span>
                 </label>
-                <label class="field field--split">
-                  <span class="field__label">Every</span>
-                  <div class="field__inline">
-                    <input id="rampEveryMonths" class="field__input field__input--figure" type="number" min="1" max="120" step="1" value="6" />
-                    <span class="field__suffix">months</span>
-                  </div>
+                <label for="rampEveryMonths" class="field-split">
+                  <span>Every</span>
+                  <span class="field-split__control">
+                    <input id="rampEveryMonths" class="figure" type="number" min="1" max="120" step="1" value="6" />
+                    <span class="field-suffix">months</span>
+                  </span>
                 </label>
               </div>
 
               <!-- Band -->
               <div class="rate-pane is-hidden" data-pane="band">
-                <label class="field field--split">
-                  <span class="field__label">Expected rate</span>
-                  <div class="field__inline">
-                    <input id="baseRateBand" class="field__input field__input--figure" type="number" min="0" max="30" step="0.01" value="3.00" />
-                    <span class="field__suffix">%</span>
-                  </div>
+                <label for="baseRateBand" class="field-split">
+                  <span>Expected rate</span>
+                  <span class="field-split__control">
+                    <input id="baseRateBand" class="figure" type="number" min="0" max="30" step="0.01" value="3.00" />
+                    <span class="field-suffix">%</span>
+                  </span>
                 </label>
-                <label class="field field--split">
-                  <span class="field__label field__label--best">Best case</span>
-                  <div class="field__inline">
-                    <input id="minRatePct" class="field__input field__input--figure" type="number" min="0" max="30" step="0.01" value="2.00" />
-                    <span class="field__suffix">%</span>
-                  </div>
+                <label for="minRatePct" class="field-split">
+                  <span class="field-label--best">Best case</span>
+                  <span class="field-split__control">
+                    <input id="minRatePct" class="figure" type="number" min="0" max="30" step="0.01" value="2.00" />
+                    <span class="field-suffix">%</span>
+                  </span>
                 </label>
-                <label class="field field--split">
-                  <span class="field__label field__label--worst">Worst case</span>
-                  <div class="field__inline">
-                    <input id="maxRatePct" class="field__input field__input--figure" type="number" min="0" max="30" step="0.01" value="5.00" />
-                    <span class="field__suffix">%</span>
-                  </div>
+                <label for="maxRatePct" class="field-split">
+                  <span class="field-label--worst">Worst case</span>
+                  <span class="field-split__control">
+                    <input id="maxRatePct" class="figure" type="number" min="0" max="30" step="0.01" value="5.00" />
+                    <span class="field-suffix">%</span>
+                  </span>
                 </label>
               </div>
             </div>
           </fieldset>
 
-          <fieldset class="group">
+          <fieldset>
             <legend>Extra payments</legend>
-            <p class="group__hint">
+            <small>
               Lump sums re-amortize the balance — payments drop, the payoff date holds.
-            </p>
+            </small>
             <div id="extraList" class="extras"></div>
-            <button type="button" id="addExtra" class="btn-add">
-              <span class="btn-add__plus">+</span> Add extra payment
+            <button type="button" id="addExtra" class="outline secondary">
+              + Add extra payment
             </button>
           </fieldset>
         </form>
@@ -251,8 +236,8 @@
                 <button type="button" class="segmented__btn" data-value="month">Monthly</button>
               </div>
             </div>
-            <div class="schedule__scroll">
-              <table class="schedule__table" id="scheduleTable">
+            <div class="schedule__scroll overflow-auto">
+              <table class="striped" id="scheduleTable">
                 <thead></thead>
                 <tbody></tbody>
               </table>
@@ -260,11 +245,11 @@
           </div>
         </section>
       </div>
-
-      <footer class="colophon">
-        <span>Runs entirely in your browser — nothing is uploaded.</span>
-      </footer>
     </main>
+
+    <footer class="container">
+      <small>Runs entirely in your browser — nothing is uploaded.</small>
+    </footer>
 
     <script type="module" src="./app.js"></script>
   </body>

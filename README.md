@@ -46,7 +46,7 @@ Requires [Node.js](https://nodejs.org/) 22+ and npm.
 
 ```bash
 npm install          # install dependencies
-npm run dev           # build + watch, served at http://localhost:8000
+npm run dev           # build + watch, served at http://localhost:5555
 npm test              # run the test suite (vitest)
 npm run typecheck     # tsc --noEmit
 ```

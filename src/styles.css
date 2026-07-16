@@ -1,92 +1,25 @@
 /* ============================================================
-   Mortgage Calculator — clean & minimal
-   Body: system sans · Figures: JetBrains Mono
+   Mortgage Calculator — built on Pico CSS (picocss.com)
+   Pico supplies typography, forms, buttons, and light/dark theming.
+   This file only adds what Pico doesn't: the segmented control,
+   the chart, the schedule table, and a few semantic colors
+   (balance / interest cost / best-worst band) layered on Pico's
+   own CSS variables so everything stays visually cohesive.
    ============================================================ */
 
 :root {
-  --paper: #f6f7f8;
-  --paper-deep: #eceef1;
-  --surface: #ffffff;
-  --ink: #1c2024;
-  --ink-soft: #5c636b;
-  --ink-faint: #8b929b;
-  --hair: #e4e7ea;
-  --hair-strong: #d2d7dc;
-  --accent: #1f7a5c; /* principal / balance */
-  --accent-soft: #e5f1ec;
-  --cost: #c0603f; /* interest / cost */
-  --cost-soft: #f6e6df;
-  --best: #3a7cba; /* band best case */
-  --worst: #c0603f; /* band worst case */
-  --focus: #1f7a5c;
-  --radius: 10px;
-  --radius-sm: 7px;
-  --shadow: none;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
 
-/* Dark tokens — shared by the system default and the explicit toggle.
-   Softer than a near-black/near-white pairing to ease eye strain. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #1b1e22;
-    --paper-deep: #212529;
-    --surface: #24282d;
-    --ink: #dce0e4;
-    --ink-soft: #9aa1a9;
-    --ink-faint: #6c737b;
-    --hair: #2f343a;
-    --hair-strong: #3c424a;
-    --accent: #4bb18e;
-    --accent-soft: #1a332c;
-    --cost: #cf8060;
-    --cost-soft: #33241b;
-    --best: #5a97c9;
-    --worst: #cf8060;
-    --focus: #4bb18e;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #1b1e22;
-  --paper-deep: #212529;
-  --surface: #24282d;
-  --ink: #dce0e4;
-  --ink-soft: #9aa1a9;
-  --ink-faint: #6c737b;
-  --hair: #2f343a;
-  --hair-strong: #3c424a;
-  --accent: #4bb18e;
-  --accent-soft: #1a332c;
-  --cost: #cf8060;
-  --cost-soft: #33241b;
-  --best: #5a97c9;
-  --worst: #cf8060;
-  --focus: #4bb18e;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: var(--body);
-  color: var(--ink);
-  background: var(--paper);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-.shell {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem) 2.5rem;
+  /* Colors sourced directly from Pico's own palette (not a custom brand
+     color) so the app matches the reference example's theme exactly.
+     Pico redefines these tokens itself under dark mode / [data-theme=dark],
+     so --accent/--best/--worst/--cost adapt automatically — no manual
+     light/dark duplication needed here. */
+  --accent: var(--pico-primary); /* principal / balance */
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--pico-card-background-color));
+  --cost: var(--pico-form-element-invalid-border-color); /* interest / cost */
+  --best: var(--pico-form-element-valid-border-color); /* band best case */
+  --worst: var(--pico-form-element-invalid-border-color); /* band worst case */
 }
 
 /* ── Masthead ─────────────────────────────────────────────── */
@@ -95,59 +28,11 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: clamp(1.5rem, 4vw, 2.25rem);
+  flex-wrap: wrap;
 }
-.theme-toggle {
-  appearance: none;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 1px solid var(--hair-strong);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--ink-soft);
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-}
-.theme-toggle:hover {
-  color: var(--ink);
-  border-color: var(--ink-faint);
-}
-.theme-toggle:focus-visible {
-  outline: none;
-  border-color: var(--focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 18%, transparent);
-}
-.theme-toggle .icon {
-  width: 1.15rem;
-  height: 1.15rem;
-}
-/* Show the icon for the theme you'd switch TO. */
-.theme-toggle .icon-sun {
-  display: none;
-}
-.theme-toggle[data-effective="dark"] .icon-sun {
-  display: block;
-}
-.theme-toggle[data-effective="dark"] .icon-moon {
-  display: none;
-}
-.title {
-  font-family: var(--body);
-  font-weight: 600;
-  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-.lede {
+.masthead hgroup {
+  margin-bottom: 0;
   max-width: 52ch;
-  margin: 0.55rem 0 0;
-  color: var(--ink-soft);
-  font-size: 0.98rem;
 }
 
 /* ── Layout ───────────────────────────────────────────────── */
@@ -164,12 +49,12 @@ body {
 }
 
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--hair);
-  border-radius: var(--radius);
+  background: var(--pico-card-background-color);
+  box-shadow: var(--pico-card-box-shadow);
+  border-radius: var(--pico-border-radius);
+  padding: var(--pico-block-spacing-vertical) var(--pico-block-spacing-horizontal);
 }
 .controls {
-  padding: clamp(1.1rem, 2vw, 1.4rem);
   position: sticky;
   top: 1.25rem;
 }
@@ -179,166 +64,98 @@ body {
   }
 }
 
-/* ── Fieldsets ────────────────────────────────────────────── */
-.group {
-  border: 0;
-  border-top: 1px solid var(--hair);
-  margin: 0;
-  padding: 1.25rem 0 0.25rem;
+/* ── Fieldset groups ──────────────────────────────────────── */
+.controls fieldset + fieldset {
+  padding-top: var(--pico-spacing);
+  border-top: var(--pico-border-width) solid var(--pico-muted-border-color);
 }
-.group:first-of-type {
-  border-top: 0;
-  padding-top: 0.25rem;
-}
-.group legend {
-  font-size: 0.8rem;
+.controls > fieldset > legend {
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--ink);
-  padding: 0;
-  margin-bottom: 0.85rem;
-}
-.group__hint {
-  margin: -0.35rem 0 0.9rem;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--pico-muted-color);
 }
 
-/* ── Fields ───────────────────────────────────────────────── */
-.field {
-  display: block;
-  margin-bottom: 0.85rem;
-}
-.field:last-child {
-  margin-bottom: 0.35rem;
-}
-.field__label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--ink-soft);
-  margin-bottom: 0.35rem;
-}
-.field__label--best {
-  color: var(--best);
-}
-.field__label--worst {
-  color: var(--worst);
-}
-.field--split {
+/* ── Compact label/input row (term, rates) ───────────────── */
+.field-split {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
 }
-.field--split .field__label {
-  margin-bottom: 0;
+.field-split span:first-child {
+  color: var(--pico-color);
 }
-
-.field__input {
-  width: 100%;
-  font-family: var(--body);
-  font-size: 1rem;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--hair-strong);
-  border-radius: var(--radius-sm);
-  padding: 0.55rem 0.7rem;
-  transition: border-color 0.15s, box-shadow 0.15s;
+.field-label--best {
+  color: var(--best);
 }
-.field__input--figure {
-  font-family: var(--mono);
-  font-weight: 500;
+.field-label--worst {
+  color: var(--worst);
 }
-.field__input:focus-visible {
-  outline: none;
-  border-color: var(--focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 18%, transparent);
-}
-
-.field__money {
-  display: flex;
-}
-.field__currency {
-  font-family: var(--mono);
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--ink-soft);
-  background: var(--paper-deep);
-  border: 1px solid var(--hair-strong);
-  border-right: 0;
-  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-  padding: 0 0.55rem;
-  cursor: pointer;
-}
-.field__money .field__input {
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  text-align: right;
-}
-.field__currency:focus-visible {
-  outline: none;
-  border-color: var(--focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 18%, transparent);
-}
-
-.field__inline {
+.field-split__control {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-.field--split .field__inline {
   width: 9.5rem;
   flex: 0 0 auto;
 }
-.field--split .field__input {
+.field-split__control input {
+  margin-bottom: 0;
   text-align: right;
 }
-.field__suffix {
+.field-suffix {
   font-size: 0.82rem;
-  color: var(--ink-faint);
+  color: var(--pico-muted-color);
   white-space: nowrap;
   min-width: 3.4rem;
 }
 
-/* ── Segmented control ────────────────────────────────────── */
+.figure {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+/* ── Segmented control ───────────────────────────────────── */
 .segmented {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
   gap: 3px;
   padding: 3px;
-  background: var(--paper-deep);
-  border-radius: var(--radius-sm);
-  margin-bottom: 1rem;
+  background: var(--pico-form-element-background-color);
+  border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+  border-radius: var(--pico-border-radius);
+  margin-bottom: var(--pico-spacing);
 }
 .segmented--sub {
-  margin-bottom: 0.9rem;
+  margin-bottom: calc(var(--pico-spacing) * 0.75);
 }
 .segmented__btn {
   appearance: none;
   border: 0;
   background: transparent;
-  font-family: var(--body);
+  font-family: inherit;
   font-weight: 500;
   font-size: 0.88rem;
-  color: var(--ink-soft);
+  color: var(--pico-muted-color);
   padding: 0.45rem 0.4rem;
-  border-radius: calc(var(--radius-sm) - 2px);
+  border-radius: calc(var(--pico-border-radius) * 0.7);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 .segmented__btn:hover {
-  color: var(--ink);
+  color: var(--pico-color);
 }
 .segmented__btn.is-active {
-  background: var(--surface);
-  color: var(--ink);
+  background: var(--pico-card-background-color);
+  color: var(--pico-color);
   font-weight: 600;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
 }
 .segmented__btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 25%, transparent);
+  box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-primary-focus);
 }
 
 .rate-pane.is-hidden {
@@ -350,113 +167,39 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
-  margin-bottom: 0.7rem;
 }
 .extra {
-  display: grid;
-  grid-template-columns: 1fr 5.5rem auto;
-  gap: 0.5rem;
-  align-items: center;
+  margin-bottom: 0;
 }
-.extra__amount,
+.extra__amount {
+  flex: 2 1 auto;
+}
 .extra__year {
-  font-family: var(--mono);
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--hair-strong);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 0.55rem;
+  flex: 0 0 6rem;
   text-align: right;
-  width: 100%;
-}
-.extra__amount:focus-visible,
-.extra__year:focus-visible {
-  outline: none;
-  border-color: var(--focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 18%, transparent);
-}
-.extra__year-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.extra__year-tag {
-  position: absolute;
-  left: 0.55rem;
-  font-size: 0.68rem;
-  color: var(--ink-faint);
-  pointer-events: none;
-  font-family: var(--mono);
-  letter-spacing: 0.05em;
-}
-.extra__year {
-  padding-left: 2.4rem;
 }
 .extra__remove {
-  appearance: none;
-  border: 1px solid var(--hair-strong);
-  background: var(--surface);
-  color: var(--ink-faint);
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: 1.1rem;
-  line-height: 1;
-  transition: color 0.15s, border-color 0.15s;
-}
-.extra__remove:hover {
-  color: var(--cost);
-  border-color: var(--cost);
-}
-.extra__remove:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cost) 22%, transparent);
+  flex: 0 0 auto;
 }
 
-.btn-add {
-  appearance: none;
+#addExtra {
   width: 100%;
-  border: 1px dashed var(--hair-strong);
-  background: transparent;
-  color: var(--accent);
-  font-family: var(--body);
-  font-weight: 500;
-  font-size: 0.88rem;
-  padding: 0.55rem;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-}
-.btn-add:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-.btn-add:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
-}
-.btn-add__plus {
-  font-family: var(--mono);
 }
 
 /* ── Results ──────────────────────────────────────────────── */
 .results {
-  padding: clamp(1.1rem, 2vw, 1.5rem);
   display: flex;
   flex-direction: column;
-  gap: clamp(1.1rem, 2.2vw, 1.5rem);
+  gap: var(--pico-block-spacing-vertical);
 }
 
 .readouts {
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr;
   gap: 1px;
-  background: var(--hair);
-  border: 1px solid var(--hair);
-  border-radius: var(--radius);
+  background: var(--pico-muted-border-color);
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
   overflow: hidden;
 }
 @media (max-width: 560px) {
@@ -465,7 +208,7 @@ body {
   }
 }
 .readout {
-  background: var(--surface);
+  background: var(--pico-card-background-color);
   padding: 1.05rem 1.1rem;
 }
 .readout--hero {
@@ -475,7 +218,7 @@ body {
   margin: 0;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--ink-faint);
+  color: var(--pico-muted-color);
 }
 .readout__value {
   margin: 0.35rem 0 0;
@@ -483,7 +226,7 @@ body {
   font-weight: 600;
   font-size: clamp(1rem, 1.9vw, 1.3rem);
   letter-spacing: -0.02em;
-  color: var(--ink);
+  color: var(--pico-color);
   line-height: 1.1;
   overflow-wrap: normal;
 }
@@ -497,7 +240,7 @@ body {
 .readout__sub {
   margin: 0.35rem 0 0;
   font-size: 0.78rem;
-  color: var(--ink-soft);
+  color: var(--pico-muted-color);
   min-height: 1em;
 }
 
@@ -514,7 +257,6 @@ body {
   flex-wrap: wrap;
 }
 .chart__title {
-  font-family: var(--body);
   font-weight: 600;
   font-size: 1rem;
 }
@@ -522,7 +264,7 @@ body {
   display: flex;
   gap: 0.9rem;
   font-size: 0.75rem;
-  color: var(--ink-soft);
+  color: var(--pico-muted-color);
   flex-wrap: wrap;
 }
 .chart__legend .key {
@@ -549,13 +291,13 @@ body {
   overflow: visible;
 }
 .chart__gridline {
-  stroke: var(--hair);
+  stroke: var(--pico-muted-border-color);
   stroke-width: 1;
 }
 .chart__axis-label {
   font-family: var(--mono);
   font-size: 10px;
-  fill: var(--ink-faint);
+  fill: var(--pico-muted-color);
 }
 .chart__area-base {
   fill: url(#areaGrad);
@@ -583,20 +325,20 @@ body {
   stroke-dasharray: 4 3;
 }
 .chart__cursor {
-  stroke: var(--ink-faint);
+  stroke: var(--pico-muted-color);
   stroke-width: 1;
   stroke-dasharray: 3 3;
 }
 .chart__dot {
   fill: var(--accent);
-  stroke: var(--surface);
+  stroke: var(--pico-card-background-color);
   stroke-width: 2;
 }
 .chart__tip {
   position: absolute;
   transform: translate(-50%, -120%);
-  background: var(--ink);
-  color: var(--surface);
+  background: var(--pico-color);
+  color: var(--pico-background-color);
   font-family: var(--mono);
   font-size: 0.72rem;
   padding: 0.4rem 0.55rem;
@@ -621,7 +363,6 @@ body {
   flex-wrap: wrap;
 }
 .schedule__title {
-  font-family: var(--body);
   font-weight: 600;
   font-size: 1rem;
   margin: 0;
@@ -632,64 +373,35 @@ body {
 }
 .schedule__scroll {
   max-height: 360px;
-  overflow: auto;
-  border: 1px solid var(--hair);
-  border-radius: var(--radius);
 }
-.schedule__table {
-  width: 100%;
-  border-collapse: collapse;
+#scheduleTable {
   font-family: var(--mono);
   font-size: 0.8rem;
 }
-.schedule__table th,
-.schedule__table td {
-  padding: 0.5rem 0.75rem;
+#scheduleTable th,
+#scheduleTable td {
   text-align: right;
   white-space: nowrap;
 }
-.schedule__table th:first-child,
-.schedule__table td:first-child {
+#scheduleTable th:first-child,
+#scheduleTable td:first-child {
   text-align: left;
 }
-.schedule__table thead th {
+#scheduleTable thead th {
   position: sticky;
   top: 0;
-  background: var(--paper-deep);
-  color: var(--ink-faint);
-  font-weight: 600;
   font-size: 0.7rem;
   letter-spacing: 0.03em;
   text-transform: uppercase;
+  background: var(--pico-card-background-color);
   z-index: 1;
 }
-.schedule__table tbody tr:nth-child(even) {
-  background: color-mix(in srgb, var(--paper) 55%, transparent);
-}
-.schedule__table tbody tr:hover {
-  background: var(--accent-soft);
-}
-.schedule__table .cell-cost {
+#scheduleTable .cell-cost {
   color: var(--cost);
 }
-.schedule__table .cell-extra {
+#scheduleTable .cell-extra {
   color: var(--accent);
   font-weight: 600;
-}
-
-/* ── Colophon ─────────────────────────────────────────────── */
-.colophon {
-  margin-top: 2rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--hair);
-  font-size: 0.78rem;
-  color: var(--ink-faint);
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-}
-.colophon__dot {
-  color: var(--hair-strong);
 }
 
 @media (prefers-reduced-motion: reduce) {
