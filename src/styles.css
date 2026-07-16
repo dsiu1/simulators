@@ -26,42 +26,43 @@
   --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Dark tokens — shared by the system default and the explicit toggle. */
+/* Dark tokens — shared by the system default and the explicit toggle.
+   Softer than a near-black/near-white pairing to ease eye strain. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #14171b;
-    --paper-deep: #1b1f24;
-    --surface: #1e2228;
-    --ink: #e6e9ec;
-    --ink-soft: #a2a9b2;
-    --ink-faint: #6f7883;
-    --hair: #2c3138;
-    --hair-strong: #3a4048;
-    --accent: #4fb894;
-    --accent-soft: #16302a;
-    --cost: #db8060;
-    --cost-soft: #33211a;
-    --best: #5f9fd8;
-    --worst: #db8060;
-    --focus: #4fb894;
+    --paper: #1b1e22;
+    --paper-deep: #212529;
+    --surface: #24282d;
+    --ink: #dce0e4;
+    --ink-soft: #9aa1a9;
+    --ink-faint: #6c737b;
+    --hair: #2f343a;
+    --hair-strong: #3c424a;
+    --accent: #4bb18e;
+    --accent-soft: #1a332c;
+    --cost: #cf8060;
+    --cost-soft: #33241b;
+    --best: #5a97c9;
+    --worst: #cf8060;
+    --focus: #4bb18e;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #14171b;
-  --paper-deep: #1b1f24;
-  --surface: #1e2228;
-  --ink: #e6e9ec;
-  --ink-soft: #a2a9b2;
-  --ink-faint: #6f7883;
-  --hair: #2c3138;
-  --hair-strong: #3a4048;
-  --accent: #4fb894;
-  --accent-soft: #16302a;
-  --cost: #db8060;
-  --cost-soft: #33211a;
-  --best: #5f9fd8;
-  --worst: #db8060;
-  --focus: #4fb894;
+  --paper: #1b1e22;
+  --paper-deep: #212529;
+  --surface: #24282d;
+  --ink: #dce0e4;
+  --ink-soft: #9aa1a9;
+  --ink-faint: #6c737b;
+  --hair: #2f343a;
+  --hair-strong: #3c424a;
+  --accent: #4bb18e;
+  --accent-soft: #1a332c;
+  --cost: #cf8060;
+  --cost-soft: #33241b;
+  --best: #5a97c9;
+  --worst: #cf8060;
+  --focus: #4bb18e;
 }
 
 * {
