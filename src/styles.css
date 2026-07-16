@@ -116,6 +116,12 @@
   font-weight: 500;
 }
 
+/* Keep the currency symbol select from growing to match the amount input —
+   Pico's role=group gives every direct child flex: 1 1 auto by default. */
+#currency {
+  flex: 0 0 4.5rem;
+}
+
 /* ── Segmented control ───────────────────────────────────── */
 .segmented {
   display: grid;
@@ -131,27 +137,40 @@
 .segmented--sub {
   margin-bottom: calc(var(--pico-spacing) * 0.75);
 }
+/* Pico's base <button> rule secretly repurposes --pico-color and
+   --pico-background-color as "filled button" tokens (white-on-primary),
+   and its own :hover/:active/:focus rules only ever reassign those SAME
+   custom properties (never the literal color/background-color). So to
+   override Pico's hover/active fill for these plain, unclassed buttons we
+   must redefine those custom properties ourselves rather than declaring
+   color/background directly — the literal declarations lose because
+   Pico's hover selectors resolve those variables at higher priority. */
 .segmented__btn {
   appearance: none;
   border: 0;
-  background: transparent;
+  --pico-background-color: transparent;
+  --pico-color: var(--pico-muted-color);
+  --pico-box-shadow: none;
   font-family: inherit;
   font-weight: 500;
   font-size: 0.88rem;
-  color: var(--pico-muted-color);
   padding: 0.45rem 0.4rem;
   border-radius: calc(var(--pico-border-radius) * 0.7);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s;
 }
-.segmented__btn:hover {
-  color: var(--pico-color);
+.segmented__btn:is(:hover, :focus, :active) {
+  --pico-background-color: transparent;
+  --pico-color: var(--pico-contrast);
 }
 .segmented__btn.is-active {
-  background: var(--pico-card-background-color);
-  color: var(--pico-color);
+  --pico-background-color: var(--pico-card-background-color);
+  --pico-color: var(--pico-contrast);
   font-weight: 600;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+}
+.segmented__btn.is-active:is(:hover, :focus, :active) {
+  --pico-background-color: var(--pico-card-background-color);
 }
 .segmented__btn:focus-visible {
   outline: none;
